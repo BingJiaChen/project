@@ -54,7 +54,7 @@ if __name__ == '__main__':
 						[0, 500]]) #Anchor3
 	tag_pos = np.array([100, 300])
 	true_dist = np.linalg.norm(anchor_pos - tag_pos, axis = 1) #計算Tag到各Anchor的距離
-	true_dist += np.random.normal(0, 6, 4) #加入誤差
+	true_dist += np.random.normal(0, 1, 4) #加入誤差
 	true_dist_diff = true_dist - true_dist[0] #計算距離差(相對於Center)
 	last_pos = [1e-6, 1e-6] #Gradient Descent的起點，注意不能為(0, 0)
 	h = 0 #高度補償
