@@ -28,7 +28,7 @@ def multiAnchorPositioning(anchor_list, distance, last_pos, h):
     Dx = 0
     Dy = 0
     i = 0
-    eps = 1e-6
+    eps = 1e-7
     beta=0.9
     while True:
         x_old = x
@@ -47,9 +47,8 @@ def multiAnchorPositioning(anchor_list, distance, last_pos, h):
 
         x = x - l_rate_x * f_partial_x / ada1
         y = y - l_rate_y * f_partial_y / ada2
-        print(i,x,y)
-        est = np.sqrt((x-x_old)**2+(y-y_old)**2)
-        if est <=0.01 :
+        # est = np.sqrt((x-x_old)**2+(y-y_old)**2)
+        if round(abs(x-x_old)[0],6)==l_rate_x and round(abs(y-y_old)[0],6)==l_rate_y :
             break
         i+=1
     Ans = np.array([x[0], y[0]])
