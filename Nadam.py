@@ -6,8 +6,8 @@ import random
 
 def multiAnchorPositioning(anchor_list, distance, last_pos, h):
 
-    l_rate_x = 0.1
-    l_rate_y = 0.1
+    l_rate_x = 1
+    l_rate_y = 1
     l = int(len(anchor_list)*(len(anchor_list)-1)/2)
     x_p1 = np.zeros((l, 1))
     y_p1 = np.zeros((l, 1))
@@ -32,9 +32,9 @@ def multiAnchorPositioning(anchor_list, distance, last_pos, h):
     i = 1
     eps = 1e-8
     beta1=0.9
-    beta2=0.999
-    alpha=0.1
-    while True:
+    beta2=0.999 
+    alpha=30
+    for times in range(100):
         x_old = x
         y_old = y
         f = np.sqrt((x - x_p1) ** 2 + (y - y_p1) ** 2 + h**2)-np.sqrt((x - x_p2) ** 2 + (y - y_p2) ** 2 + h**2)-r_p
@@ -52,10 +52,11 @@ def multiAnchorPositioning(anchor_list, distance, last_pos, h):
         y = y-alpha/(np.sqrt(vy_hat)+eps)*(beta1*my_hat+(1-beta1)/(1-beta1**i)*f_partial_y)
         est = np.sqrt((x-x_old)**2+(y-y_old)**2)
         # print(i,x,y)
-        if est<=0.000001 :
+        if est<=0.001 :
             break
         i+=1
     Ans = np.array([x,y])
+    # print(Ans)
     return Ans
 
 
@@ -68,15 +69,17 @@ if __name__ == '__main__':
     times = 100
     for i in range(times):
         anchor_pos = np.array([[0, 0],  #Acnrho0(Center)
-                            [8, 0],  #Anchor1
-                            [8, 6],  #Anchor2
-                            [0, 6]]) #Anchor3
-        tag_pos = np.array([4+15*np.cos(interval[i]),3+15*np.sin(interval[i])])
-        # tag_pos = np.array([4+2.5*np.cos(interval[i]),3+2.5*np.sin(interval[i])])
+                            [9, 0],  #Anchor1
+                            [9, 5],  #Anchor2
+                            [0, 5]]) #Anchor3
+        # tag_pos = np.array([4+5*np.cos(interval[i]),3+5*np.sin(interval[i])])
+        tag_pos = np.array([-10,0])
+        # tag_pos = np.array([100+150*np.cos(interval[i]),100+150*np.sin(interval[i])])
         true_dist = np.linalg.norm(anchor_pos - tag_pos, axis = 1) #計算Tag到各Anchor的距離
         true_dist += np.random.normal(0, 0.06, 4) #加入誤差
         true_dist_diff = true_dist - true_dist[0] #計算距離差(相對於Center)
-        last_pos = estimated_tag_pos #Gradient Descent的起點，注意不能為(0, 0)
+        # last_pos = estimated_tag_pos #Gradient Descent的起點，注意不能為(0, 0)
+        last_pos = np.array([9*random.random(),5*random.random()])
         h = 0 #高度補償
         flag = time.time()
         estimated_tag_pos = multiAnchorPositioning(anchor_pos, true_dist, last_pos, h)
@@ -84,9 +87,6 @@ if __name__ == '__main__':
         # plt.plot(estimated_tag_pos[0],estimated_tag_pos[1],"bo")
         est += np.sqrt((estimated_tag_pos[0]-tag_pos[0])**2+(estimated_tag_pos[1]-tag_pos[1])**2)
         spend_time+=t
+        # print("The %d times:"%(i+1),t,"s")
     print("average error: ",est/times,"m")
     print("average time",spend_time/times,"s")
-    # plt.xlim(0,8)
-    # plt.ylim(0,6)
-    # plt.title("AdaGrad")
-    # plt.show()
